@@ -7,6 +7,8 @@
 @property (assign) NSUInteger quality;
 @property (assign) NSUInteger targetWidth;
 @property (assign) NSUInteger targetHeight;
+@property (assign) float aspectWidth;
+@property (assign) float aspectHeight;
 @end
 
 @implementation CTCrop
@@ -19,6 +21,8 @@
     self.quality = options[@"quality"] ? [options[@"quality"] intValue] : 100;
     self.targetWidth = options[@"targetWidth"] ? [options[@"targetWidth"] intValue] : -1;
     self.targetHeight = options[@"targetHeight"] ? [options[@"targetHeight"] intValue] : -1;
+    self.aspectWidth = options[@"aspectWidth"] ? [options[@"aspectWidth"] floatValue] : 1;
+    self.aspectHeight = options[@"aspectHeight"] ? [options[@"aspectHeight"] floatValue] : 1;
     NSString *filePrefix = @"file://";
     
     if ([imagePath hasPrefix:filePrefix]) {
@@ -42,15 +46,17 @@
     
     CGFloat width = self.targetWidth > -1 ? (CGFloat)self.targetWidth : image.size.width;
     CGFloat height = self.targetHeight > -1 ? (CGFloat)self.targetHeight : image.size.height;
-    CGFloat length = MIN(width, height);
+    int aspectPieces = MAX(self.aspectWidth, self.aspectHeight);
+    CGFloat baseLength = (MIN(width, height) / aspectPieces);
+
     cropController.toolbarHidden = YES;
     cropController.rotationEnabled = NO;
     cropController.keepingCropAspectRatio = YES;
     
-    cropController.imageCropRect = CGRectMake((width - length) / 2,
-                                              (height - length) / 2,
-                                              length,
-                                              length);
+    cropController.imageCropRect = CGRectMake((width - (baseLength * aspectPieces)) / 2,
+                                              (height - (baseLength * aspectPieces)) / 2,
+                                              baseLength * self.aspectWidth,
+                                              baseLength * self.aspectHeight);
     
     self.callbackId = command.callbackId;
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:cropController];

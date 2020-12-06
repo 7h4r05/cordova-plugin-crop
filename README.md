@@ -1,19 +1,13 @@
-# Important
-
-## This project is deprecated. No new changes nor bugfixes will be added.
-
-
 # cordova-plugin-crop
 
 
-
-> Crop an image in a Cordova app
+> Crop an image with aspect in a Cordova app
 
 
 ## Install
 
 ```
-$ cordova plugin add --save cordova-plugin-crop
+$ cordova plugin add --save 7h4r05/cordova-plugin-crop
 ```
 
 
@@ -53,6 +47,15 @@ The resulting JPEG picture width. default: -1
  * targetHeight: Number
 
 The resulting JPEG picture height. default: -1
+ 
+ * aspectWidth: Number
+
+Cropper width aspect. default: 1
+
+ * aspectHeight: Number
+
+ Cropper height aspect. default: 1
+
 
 ## Ionic / Typescript Example Angular 2 Service
 
@@ -91,7 +94,12 @@ export class CameraService {
           fileUri = 'file://' + fileUri;
 
           /* Using cordova-plugin-crop starts here */
-          return Crop.crop(fileUri, { quality: 100, targetWidth: -1, targetHeight: -1 });
+          /* Crop rectngle with aspect 3:4 */s
+          return Crop.crop(fileUri, { quality: 100, 
+          targetWidth: -1,
+          targetHeight: -1,
+          aspectWidth: 3,
+          aspectHeight: 4 });
         }
       })
       .then((path) => {
