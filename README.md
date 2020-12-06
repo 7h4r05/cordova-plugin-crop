@@ -57,59 +57,61 @@ Cropper width aspect. default: 1
  Cropper height aspect. default: 1
 
 
-## Ionic / Typescript Example Angular 2 Service
+## Ionic / Typescript Example Angular 10 Service
 
 <img src="screenshot-example.png" width="250" height="500">
 
-This is an example service that uses ionic-native's built in camera and the cordova-plugin-crop to create a cropped version of the image and return the file path. 
+This is an example service that uses ionic-native's built in camera and the 7h4r05@cordova-plugin-crop to create a cropped version of the image and return the file path. 
 
 ```js
 import { Injectable } from '@angular/core';
-import { Platform } from 'ionic-angular';
-import { Camera, Crop } from 'ionic-native';
 
-@Injectable()
+import { Camera, CameraOptions} from '@ionic-native/camera/ngx';
+import { CropWithAspect } from 'ionic-crop-image-with-aspect';
+
+@Injectable({
+    providedIn: 'root'
+})
 export class CameraService {
 
-  public options: any = {
-        allowEdit: true,
-        sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM,
-        mediaType: Camera.MediaType.ALLMEDIA,
-        destinationType: Camera.DestinationType.FILE_URI
-  }
-  
-  constructor(public platform: Platform) {}
+    constructor(private camera: Camera,
+                private crop: CropWithAspect) {
+    }
 
-  // Return a promise to catch errors while loading image
-  getMedia(): Promise<any> {
-    // Get Image from ionic-native's built in camera plugin
-    return Camera.getPicture(this.options)
-      .then((fileUri) => {
-        // Crop Image, on android this returns something like, '/storage/emulated/0/Android/...'
-        // Only giving an android example as ionic-native camera has built in cropping ability
-        if (this.platform.is('ios')) {
-          return fileUri
-        } else if (this.platform.is('android')) {
-          // Modify fileUri format, may not always be necessary
-          fileUri = 'file://' + fileUri;
+    takePicture(): Promise<string> {
+        return this.getPicture({ sourceType: this.camera.PictureSourceType.CAMERA });
+    }
 
-          /* Using cordova-plugin-crop starts here */
-          /* Crop rectngle with aspect 3:4 */s
-          return Crop.crop(fileUri, { quality: 100, 
-          targetWidth: -1,
-          targetHeight: -1,
-          aspectWidth: 3,
-          aspectHeight: 4 });
-        }
-      })
-      .then((path) => {
-        // path looks like 'file:///storage/emulated/0/Android/data/com.foo.bar/cache/1477008080626-cropped.jpg?1477008106566'
-        console.log('Cropped Image Path!: ' + path);
-        return path;
-      })
-  }
-  
-}  
+    choosePicture(): Promise<string> {
+        return this.getPicture({ sourceType: this.camera.PictureSourceType.SAVEDPHOTOALBUM });
+    }
+
+    private getPicture(options: CameraOptions): Promise<string> {
+        options = !options ? {} : options;
+        options.quality = 80;
+        options.destinationType = this.camera.DestinationType.FILE_URI;
+        options.encodingType = this.camera.EncodingType.PNG;
+        options.mediaType = this.camera.MediaType.PICTURE;
+        options.targetHeight = 2000;
+        options.targetWidth = 2000;
+        options.correctOrientation = true;
+
+        return this.camera
+            .getPicture(options)
+            .then(async photoUrl => {
+                const url = await this.crop.crop(photoUrl, {
+                    quality: 80,
+                    aspectWidth: 4,
+                    aspectHeight: 5
+                });
+                return url;
+            })
+            .catch(e => {
+                return null;
+            });
+    }
+}
+
 ```
 
 
