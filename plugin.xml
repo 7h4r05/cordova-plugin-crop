@@ -2,12 +2,12 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
   xmlns:android="http://schemas.android.com/apk/res/android"
   id="cordova-plugin-crop"
-  version="0.3.1">
+  version="0.5.0">
 
   <name>CropPlugin</name>
 
   <description>
-    Crop an image in a Cordova app
+    Crop an image with aspect in a Cordova app
   </description>
 
   <license>MIT</license>

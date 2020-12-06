@@ -7,7 +7,7 @@
 ## Install
 
 ```
-$ cordova plugin add --save 7h4r05/cordova-plugin-crop
+$ cordova plugin add https://github.com/7h4r05/cordova-plugin-crop
 ```
 
 
